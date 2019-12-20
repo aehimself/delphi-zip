@@ -20,8 +20,6 @@
 { Are implemented in this unit.                         }
 {*******************************************************}
 
-                        
-
 unit System.Zip2;
 
 interface
@@ -265,7 +263,7 @@ type
     function GetFileNames: TArray<string>;
     procedure ReadCentralHeader;
     procedure SetUTF8Support(const Value: Boolean);
-    function LocateEndOfCentralHeader(var Header: TZipEndOfCentralHeader): Boolean;
+    function LocateEndOfCentralHeader(var Header: TZipEndOfCentralHeader; inForceRewind: Boolean): Boolean;
     procedure DoZLibProgress(Sender: TObject);
     function ZIP64_LocateEndOfCentralHeader(var Header: TZip64_EndOfCentralDirectory): Boolean;
   protected
@@ -407,8 +405,6 @@ type
     /// <param name="CentralHeader">A Pointer to an optional central header. If no
     /// central Header is provided, the Local Header information is used. </param>
     procedure Add(Data: TStream; LocalHeader: TZipHeader; CentralHeader: PZipHeader = nil); overload;
-                                                         
-                                                       
     /// <summary>
     /// Event fired before a file inside a zip file is decompressed, allows access to the raw stream for decrypt purposes
     /// </summary>
@@ -1057,7 +1053,8 @@ begin
   if FStream.Size = 0 then
     Exit;
   // Read End Of Centeral Direcotry Header
-  if not LocateEndOfCentralHeader(LEndHeader) then
+  if not LocateEndOfCentralHeader(LEndHeader, False) and
+     not LocateEndOfCentralHeader(LEndHeader, True) then
     raise EZipException.CreateRes(@SZipErrorRead);
 
   // Read from End Of Central Directory Header
@@ -1235,7 +1232,7 @@ begin
     try
       Z.FStream := TFileStream.Create(ZipFileName, fmOpenRead or fmShareDenyWrite);
       try
-        Result := Z.LocateEndOfCentralHeader(Header);
+        Result := Z.LocateEndOfCentralHeader(Header, False) Or Z.LocateEndOfCentralHeader(Header, True);
       finally
         Z.FStream.Free;
       end;
@@ -1247,13 +1244,13 @@ begin
   end;
 end;
 
-function TZipFile.LocateEndOfCentralHeader(var Header: TZipEndOfCentralHeader): Boolean;
+function TZipFile.LocateEndOfCentralHeader(var Header: TZipEndOfCentralHeader; inForceRewind: Boolean): Boolean;
 var
   I: Integer;
   LBackRead, LReadSize, LMaxBack: UInt32;
   LBackBuf: TBytes;
 begin
-  if FStream.Size < $FFFF then
+  if (FStream.Size < $FFFF) Or (inForceRewind) then
     LMaxBack := FStream.Size
   else
     LMaxBack := $FFFF;
@@ -2040,4 +2037,3 @@ begin
 end;
 
 end.
-
