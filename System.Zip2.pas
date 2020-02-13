@@ -1212,6 +1212,7 @@ end;
 class destructor TZipFile.Destroy;
 begin
   FCompressionHandler.Free;
+  FCP437Encoding.Free;
 end;
 
 class procedure TZipFile.RegisterCompressionHandler(
