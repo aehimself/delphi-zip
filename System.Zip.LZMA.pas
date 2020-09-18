@@ -36,6 +36,7 @@ type
         aProgress: TZipProgressEvent); reintroduce;
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
+    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
     function Read(Buffer: TBytes; Offset, Count: Longint): Longint; override;
   end;
 
@@ -243,6 +244,13 @@ begin
     FProgress(Self, TEncoding.Default.GetString(FZipHeader.FileName), FZipHeader, FDecompressSize);
 
   Result := BufferPos;
+end;
+
+function TLZMADecoderStream.Seek(const Offset: Int64;
+  Origin: TSeekOrigin): Int64;
+begin
+  if (Offset = 0) and (Origin = soCurrent) then
+    Result := FZipHeader.UncompressedSize;
 end;
 
 procedure RegisterLZMA;

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{2E606746-3857-4E9C-A9E9-67A2560342CA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="lzmasdk\Delphi\LzmaSDK.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Zip.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="LzmaSDK">
+        <MSBuild Projects="lzmasdk\Delphi\LzmaSDK.dproj"/>
+    </Target>
+    <Target Name="LzmaSDK:Clean">
+        <MSBuild Projects="lzmasdk\Delphi\LzmaSDK.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LzmaSDK:Make">
+        <MSBuild Projects="lzmasdk\Delphi\LzmaSDK.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Zip">
+        <MSBuild Projects="Zip.dproj"/>
+    </Target>
+    <Target Name="Zip:Clean">
+        <MSBuild Projects="Zip.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Zip:Make">
+        <MSBuild Projects="Zip.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="LzmaSDK;Zip"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="LzmaSDK:Clean;Zip:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="LzmaSDK:Make;Zip:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
